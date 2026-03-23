@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRequest } from "../utils/requestSlice";
+import { addRequest, removeRequest } from "../utils/requestSlice";
 import axios from "axios";
 import { BASE_URL } from "../utils/constant";
 
@@ -15,6 +15,22 @@ const Request = () => {
       });
       console.log(response.data.data);
       dispatch(addRequest(response.data.data));
+    } catch (error) {
+      console.log(error.resposne);
+    }
+  };
+
+  const reviewRequest = async (status, requestId) => {
+    try {
+      const response = await axios.post(
+        BASE_URL + "/request/review/" + status + "/" + requestId,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(response.data.data);
+      dispatch(removeRequest(requestId));
     } catch (error) {
       console.log(error.resposne);
     }
@@ -46,8 +62,18 @@ const Request = () => {
           <p>{user.fromUserId.age + " " + user.fromUserId.gender}</p>
           <p>{user.fromUserId.about}</p>
           <div className="card-actions justify-center mt-2">
-            <button className="btn btn-primary">Accept</button>
-            <button className="btn btn-secondary">Ignore</button>
+            <button
+              className="btn btn-primary"
+              onClick={() => reviewRequest("accepted", user._id)}
+            >
+              Accept
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => reviewRequest("rejected", user._id)}
+            >
+              Reject
+            </button>
           </div>
         </div>
       ))}
